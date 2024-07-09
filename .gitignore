@@ -1,0 +1,59 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Log files
+*.log
+
+# Environment variables
+.env
+
+# Dependency directories
+node_modules/
+vendor/
+
+# IDE specific files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Go build artifacts
+*.out
+*.exe
+*.test
+*.mod
+*.sum
+
+# Temporary files
+*.tmp
+*.temp
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# Compiled Python files
+*.pyc
+*.pyo
+__pycache__/
+
+# Compiled Java files
+*.class
+
+# Java Eclipse and IntelliJ IDEA project files
+*.classpath
+*.project
+*.iml
+*.ipr
+*.iws
+
+# JavaScript build files
+dist/
+build/
+
