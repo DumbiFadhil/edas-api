@@ -61,7 +61,7 @@ EDAS (Evaluation based on Distance from Average Solution) API is a decision supp
 
 Start the server with:
 
-    ```sh
+    ```
     ./edas-api
     ```
 
