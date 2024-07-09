@@ -61,8 +61,9 @@ EDAS (Evaluation based on Distance from Average Solution) API is a decision supp
 
 Start the server with:
 
-```sh
-./edas-api
+    ```sh
+    ./edas-api
+    ```
 
 The server will start on `http://localhost:8080`.
 
@@ -119,6 +120,7 @@ curl -X POST http://localhost:8080/api/edas \
             {"name": "Criteria2", "weight": 0.5}
         ]
     }'
+```
 
 ## Contributing
 
