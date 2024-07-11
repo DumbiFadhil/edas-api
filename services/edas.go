@@ -5,6 +5,14 @@ import (
 	"sort"
 )
 
+// Helper function for max calculation
+func max(a, b float64) float64 {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 func CalculateEDAS(request models.EDASRequest) models.EDASResponse {
 	alternatives := request.Alternatives
 	criteria := request.Criteria
@@ -12,7 +20,7 @@ func CalculateEDAS(request models.EDASRequest) models.EDASResponse {
 	// Step 1: Calculate average score per criterion
 	criterionAverages := make(map[string]float64)
 	for _, criterion := range criteria {
-		totalScore := float64(0) // Use 0 for initialization
+		totalScore := float64(0)
 		for _, alt := range alternatives {
 			totalScore += alt.Scores[criterion.Name]
 		}
@@ -20,29 +28,47 @@ func CalculateEDAS(request models.EDASRequest) models.EDASResponse {
 	}
 
 	// Step 2: Calculate positive and negative distances
-	for _, alt := range alternatives { // No need for unused index 'i'
+	for _, alt := range alternatives {
 		var positiveDistance, negativeDistance float64
 		for _, criterion := range criteria {
 			avg := criterionAverages[criterion.Name]
 			score := alt.Scores[criterion.Name]
-			if score >= avg {
-				positiveDistance += (score - avg) * criterion.Weight
-			} else {
-				negativeDistance += (avg - score) * criterion.Weight
+			if criterion.Type == "benefit" {
+				positiveDistance += (max(0, score-avg) / avg) * criterion.Weight
+				negativeDistance += (max(0, avg-score) / avg) * criterion.Weight
+			} else { // "cost"
+				positiveDistance += (max(0, avg-score) / avg) * criterion.Weight
+				negativeDistance += (max(0, score-avg) / avg) * criterion.Weight
 			}
 		}
 		alt.Scores["PositiveDistance"] = positiveDistance
 		alt.Scores["NegativeDistance"] = negativeDistance
 	}
 
-	// Step 3: Calculate overall appraisal score
-	rankedAlternatives := make([]models.RankedAlternative, len(alternatives))
-	for i, alt := range alternatives { // 'i' used here for indexing
-		overallScore := (alt.Scores["PositiveDistance"] - alt.Scores["NegativeDistance"]) / 2
-		rankedAlternatives[i] = models.RankedAlternative{Name: alt.Name, Score: overallScore}
+	// Step 3: Normalize positive and negative distances
+	var maxPositiveDistance, maxNegativeDistance float64
+	for _, alt := range alternatives {
+		if alt.Scores["PositiveDistance"] > maxPositiveDistance {
+			maxPositiveDistance = alt.Scores["PositiveDistance"]
+		}
+		if alt.Scores["NegativeDistance"] > maxNegativeDistance {
+			maxNegativeDistance = alt.Scores["NegativeDistance"]
+		}
 	}
 
-	// Step 4: Sort alternatives by overall score
+	for _, alt := range alternatives {
+		alt.Scores["NormalizedPositiveDistance"] = alt.Scores["PositiveDistance"] / maxPositiveDistance
+		alt.Scores["NormalizedNegativeDistance"] = alt.Scores["NegativeDistance"] / maxNegativeDistance
+	}
+
+	// Step 4: Calculate final score
+	rankedAlternatives := make([]models.RankedAlternative, len(alternatives))
+	for i, alt := range alternatives {
+		finalScore := (alt.Scores["NormalizedPositiveDistance"] + (1 - alt.Scores["NormalizedNegativeDistance"])) / 2
+		rankedAlternatives[i] = models.RankedAlternative{Name: alt.Name, Score: finalScore}
+	}
+
+	// Step 5: Rank alternatives
 	sort.SliceStable(rankedAlternatives, func(i, j int) bool {
 		return rankedAlternatives[i].Score > rankedAlternatives[j].Score
 	})
