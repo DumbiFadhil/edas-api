@@ -33,7 +33,7 @@ EDAS (Evaluation based on Distance from Average Solution) API is a decision supp
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/your-username/edas-api.git
+    git clone https://github.com/DumbiFadhil/edas-api.git
     cd edas-api
     ```
 
@@ -53,6 +53,14 @@ EDAS (Evaluation based on Distance from Average Solution) API is a decision supp
 
     ```sh
     ./edas-api
+    ```
+
+**OR**
+
+3. Immediately start the server without building executable file:
+
+    ```sh
+    go run main.go
     ```
 
 ## Usage
@@ -79,13 +87,19 @@ The server will start on `http://localhost:8080`.
     ```json
     {
         "alternatives": [
-            {"name": "Alt1", "scores": {"Criteria1": 3.5, "Criteria2": 7.0}},
-            {"name": "Alt2", "scores": {"Criteria1": 4.0, "Criteria2": 6.5}},
-            {"name": "Alt3", "scores": {"Criteria1": 3.0, "Criteria2": 8.0}}
+            {"name": "Alt1", "scores": {"Criteria1": 20, "Criteria2": 10, "Criteria3": 30, "Criteria4": 25, "Criteria5": 5}},
+            {"name": "Alt2", "scores": {"Criteria1": 15, "Criteria2": 7, "Criteria3": 21, "Criteria4": 60, "Criteria5": 3}},
+            {"name": "Alt3", "scores": {"Criteria1": 18, "Criteria2": 8, "Criteria3": 22, "Criteria4": 40, "Criteria5": 4}},
+            {"name": "Alt4", "scores": {"Criteria1": 23, "Criteria2": 6, "Criteria3": 31, "Criteria4": 40, "Criteria5": 8}},
+            {"name": "Alt5", "scores": {"Criteria1": 17, "Criteria2": 9, "Criteria3": 27, "Criteria4": 20, "Criteria5": 4}}
+
         ],
         "criteria": [
-            {"name": "Criteria1", "weight": 0.5},
-            {"name": "Criteria2", "weight": 0.5}
+            {"name": "Criteria1", "weight": 0.3, "type": "benefit"},
+            {"name": "Criteria2", "weight": 0.1, "type": "benefit"},
+            {"name": "Criteria3", "weight": 0.2, "type": "cost"},
+            {"name": "Criteria4", "weight": 0.2, "type": "cost"},
+            {"name": "Criteria5", "weight": 0.2, "type": "cost"}
         ]
     }
     ```
@@ -95,9 +109,26 @@ The server will start on `http://localhost:8080`.
     ```json
     {
         "ranking": [
-            {"name": "Alt3", "score": 0.75},
-            {"name": "Alt2", "score": 0.25},
-            {"name": "Alt1", "score": -0.25}
+            {
+                "name": "Alt5",
+                "score": 0.9244443265623181
+            },
+            {
+                "name": "Alt1",
+                "score": 0.8198183184953796
+            },
+            {
+                "name": "Alt3",
+                "score": 0.6761050498859149
+            },
+            {
+                "name": "Alt2",
+                "score": 0.45498470350972064
+            },
+            {
+                "name": "Alt4",
+                "score": 0.25764249729644173
+            }
         ]
     }
     ```
@@ -111,13 +142,19 @@ curl -X POST http://localhost:8080/api/edas \
     -H "Content-Type: application/json" \
     -d '{
         "alternatives": [
-            {"name": "Alt1", "scores": {"Criteria1": 3.5, "Criteria2": 7.0}},
-            {"name": "Alt2", "scores": {"Criteria1": 4.0, "Criteria2": 6.5}},
-            {"name": "Alt3", "scores": {"Criteria1": 3.0, "Criteria2": 8.0}}
+            {"name": "Alt1", "scores": {"Criteria1": 20, "Criteria2": 10, "Criteria3": 30, "Criteria4": 25, "Criteria5": 5}},
+            {"name": "Alt2", "scores": {"Criteria1": 15, "Criteria2": 7, "Criteria3": 21, "Criteria4": 60, "Criteria5": 3}},
+            {"name": "Alt3", "scores": {"Criteria1": 18, "Criteria2": 8, "Criteria3": 22, "Criteria4": 40, "Criteria5": 4}},
+            {"name": "Alt4", "scores": {"Criteria1": 23, "Criteria2": 6, "Criteria3": 31, "Criteria4": 40, "Criteria5": 8}},
+            {"name": "Alt5", "scores": {"Criteria1": 17, "Criteria2": 9, "Criteria3": 27, "Criteria4": 20, "Criteria5": 4}}
+
         ],
         "criteria": [
-            {"name": "Criteria1", "weight": 0.5},
-            {"name": "Criteria2", "weight": 0.5}
+            {"name": "Criteria1", "weight": 0.3, "type": "benefit"},
+            {"name": "Criteria2", "weight": 0.1, "type": "benefit"},
+            {"name": "Criteria3", "weight": 0.2, "type": "cost"},
+            {"name": "Criteria4", "weight": 0.2, "type": "cost"},
+            {"name": "Criteria5", "weight": 0.2, "type": "cost"}
         ]
     }'
 ```
