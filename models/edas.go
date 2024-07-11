@@ -21,6 +21,7 @@ type EDASResponse struct {
 }
 
 type RankedAlternative struct {
+	Rank  int     `json:"rank"`
 	Name  string  `json:"name"`
 	Score float64 `json:"score"`
 }

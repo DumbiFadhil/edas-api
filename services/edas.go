@@ -73,5 +73,10 @@ func CalculateEDAS(request models.EDASRequest) models.EDASResponse {
 		return rankedAlternatives[i].Score > rankedAlternatives[j].Score
 	})
 
+	// Assign ranks
+	for i := range rankedAlternatives {
+		rankedAlternatives[i].Rank = i + 1
+	}
+
 	return models.EDASResponse{Ranking: rankedAlternatives}
 }
