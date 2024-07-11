@@ -1,11 +1,18 @@
 package config
 
 import (
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 )
 
 func SetupRouter() *gin.Engine {
-    router := gin.Default()
-    return router
-}
+	router := gin.New()
 
+	// Attach middleware
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+
+	// Configure trusted proxies if needed
+	// router.SetTrustedProxies([]string{"192.168.1.1"})
+
+	return router
+}
