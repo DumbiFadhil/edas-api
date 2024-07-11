@@ -30,6 +30,14 @@ func main() {
 	// Configure routes
 	routes.SetupRoutes(router)
 
-	// Start the server
-	router.Run(":8080")
+	// Print server start indicator
+	go func() {
+		if err := router.Run(":8080"); err != nil {
+			log.Fatal("Server failed to start:", err)
+		}
+	}()
+	println("Server started on port 8080")
+
+	// Block the main goroutine
+	select {}
 }
