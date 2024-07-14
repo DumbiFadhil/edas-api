@@ -3,6 +3,7 @@ package main
 import (
 	"DumbiFadhil/edas-api/config"
 	"DumbiFadhil/edas-api/routes"
+	"DumbiFadhil/edas-api/services"
 	"log"
 	"os"
 
@@ -23,6 +24,22 @@ func main() {
 		mode = gin.DebugMode
 	}
 	gin.SetMode(mode)
+
+	// Initialize MongoDB connection
+	mongoURI := os.Getenv("MONGODB_URI")
+	dbName := os.Getenv("MONGODB_DB_NAME")
+	if mongoURI == "" || dbName == "" {
+		log.Fatal("MONGODB_URI and MONGODB_DB_NAME must be set in the .env file")
+	}
+	services.ConnectToDB(mongoURI, dbName)
+
+	// Test MongoDB connection
+	err = services.TestDBConnection()
+	if err != nil {
+		log.Fatal("Failed to connect to MongoDB:", err)
+	} else {
+		log.Println("Successfully connected to MongoDB!")
+	}
 
 	// Initialize the Gin router
 	router := config.SetupRouter()

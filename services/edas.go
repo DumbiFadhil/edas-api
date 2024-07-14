@@ -2,7 +2,12 @@ package services
 
 import (
 	"DumbiFadhil/edas-api/models"
+	"context"
+	"log"
 	"sort"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 // Helper function for max calculation
@@ -11,6 +16,22 @@ func max(a, b float64) float64 {
 		return a
 	}
 	return b
+}
+
+func SaveHistory(history models.History) error {
+	// Generate a new UUID
+	history.UUID = uuid.New()
+
+	collection := db.Collection("history")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := collection.InsertOne(ctx, history)
+	if err != nil {
+		log.Println("Failed to save history:", err)
+		return err
+	}
+	return nil
 }
 
 func CalculateEDAS(request models.EDASRequest) models.EDASResponse {
@@ -78,5 +99,19 @@ func CalculateEDAS(request models.EDASRequest) models.EDASResponse {
 		rankedAlternatives[i].Rank = i + 1
 	}
 
-	return models.EDASResponse{Ranking: rankedAlternatives}
+	// Create EDASResponse
+	edasResponse := models.EDASResponse{Ranking: rankedAlternatives}
+
+	// Save to history
+	history := models.History{
+		EDASRequests:  []models.EDASRequest{request},
+		EDASResponses: []models.EDASResponse{edasResponse},
+		Rankings:      rankedAlternatives,
+	}
+	err := SaveHistory(history)
+	if err != nil {
+		log.Println("Failed to save history:", err)
+	}
+
+	return edasResponse
 }
