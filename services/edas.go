@@ -108,6 +108,7 @@ func CalculateEDAS(request models.EDASRequest) models.EDASResponse {
 		EDASResponses: []models.EDASResponse{edasResponse},
 		Rankings:      rankedAlternatives,
 	}
+
 	err := SaveHistory(history)
 	if err != nil {
 		log.Println("Failed to save history:", err)

@@ -6,6 +6,131 @@
 
 EDAS (Evaluation based on Distance from Average Solution) API is a decision support system implemented in Go (Golang). This API allows users to evaluate multiple alternatives based on various criteria and rank them accordingly. It provides a robust and efficient solution for multi-criteria decision making.
 
+This algorithm provides a structured way to evaluate and rank multiple alternatives based on their performance across various criteria. It's particularly useful when criteria have varying importance (weights) and can be either beneficial (higher scores are better) or cost-oriented (lower scores are better).
+
+**How EDAS Works**
+
+1. **Average Score Calculation:**
+   - For each criterion, calculate the average score across all alternatives.
+
+2. **Distance Calculation:**
+   - For each alternative and criterion:
+      - Determine the positive distance (how much better the alternative is than average).
+      - Determine the negative distance (how much worse the alternative is than average).
+      - Adjust distances based on the criterion's type (benefit or cost) and weight.
+
+3. **Normalization:**
+   - Normalize positive and negative distances to a 0-1 scale for easier comparison.
+
+4. **Final Score:**
+   - Calculate a final score for each alternative by combining normalized distances. This score considers both how much better the alternative is on some criteria and how much worse it might be on others.
+
+5. **Ranking:**
+   - Sort alternatives based on their final scores, from highest to lowest.
+
+## Code Breakdown
+1. **Initialization:**
+    ```Go
+    criterionAverages := make(map[string]float64)  // Map to store average scores
+    rankedAlternatives := make([]models.RankedAlternative, len(alternatives)) // Slice for ranked results
+    ```
+Two data structures are created:
+
+criterionAverages stores the average score for each criterion.
+rankedAlternatives will hold the final results (alternatives with their calculated scores and ranks).
+
+2. **Calculate Average Score per Criterion:**
+    ```Go
+    for _, criterion := range criteria {
+        totalScore := float64(0)
+        for _, alt := range alternatives {
+            totalScore += alt.Scores[criterion.Name]
+        }
+        criterionAverages[criterion.Name] = totalScore / float64(len(alternatives))
+    }
+    ```
+- We iterate through each criterion.
+- For each criterion, we sum the scores across all alternatives.
+- The total score is divided by the number of alternatives to get the average.
+- The average score is stored in the criterionAverages map.
+
+3. **Calculate Average Score per Criterion:**
+    ```Go
+    for _, alt := range alternatives {
+        var positiveDistance, negativeDistance float64
+        for _, criterion := range criteria {
+            avg := criterionAverages[criterion.Name]
+            score := alt.Scores[criterion.Name]
+            // ... (calculations for positive and negative distances based on criterion type)
+        }
+        alt.Scores["PositiveDistance"] = positiveDistance
+        alt.Scores["NegativeDistance"] = negativeDistance
+    }
+    ```
+- We iterate through each alternative.
+- For each criterion, we calculate:
+  - The positiveDistance (how much better the alternative is than average).
+  - The negativeDistance (how much worse the alternative is than average).
+- These distances are adjusted based on whether the criterion is a "benefit" (higher score is better) or "cost" (lower score is better).
+- The calculated distances are stored in the alt.Scores map.
+
+4. **Normalize Distances:**
+    ```Go
+    // ... (find maxPositiveDistance and maxNegativeDistance)
+
+    for _, alt := range alternatives {
+        alt.Scores["NormalizedPositiveDistance"] = alt.Scores["PositiveDistance"] / maxPositiveDistance
+        alt.Scores["NormalizedNegativeDistance"] = alt.Scores["NegativeDistance"] / maxNegativeDistance
+    }
+    ```
+- After finding the maximum positive and negative distances, we normalize them to the range of 0 to 1.
+- Each alternative's positive and negative distances are divided by the respective maximum values.
+
+5. **Calculate Final Score:**
+    ```Go
+    for i, alt := range alternatives {
+        finalScore := (alt.Scores["NormalizedPositiveDistance"] + (1 - alt.Scores["NormalizedNegativeDistance"])) / 2
+        rankedAlternatives[i] = models.RankedAlternative{Name: alt.Name, Score: finalScore}
+    }
+    ```
+- For each alternative, the final score is calculated as the average of the normalized positive distance and the complement of the normalized negative distance (1 minus the normalized negative distance).
+- RankedAlternative structs are created to store the Name and Score of each alternative.
+
+6. **Rank Alternatives:**
+    ```Go
+    sort.SliceStable(rankedAlternatives, func(i, j int) bool {
+        return rankedAlternatives[i].Score > rankedAlternatives[j].Score
+    })
+
+    // Assign ranks
+    for i := range rankedAlternatives {
+      rankedAlternatives[i].Rank = i + 1
+    }
+    ```
+- The rankedAlternatives slice is sorted in descending order based on the Score of each RankedAlternative.
+
+7. **Create Response and Save History (Optional & Require MongoDB Connection)**:
+    ```Go
+    // Create EDASResponse
+    edasResponse := models.EDASResponse{Ranking: rankedAlternatives}
+
+    // Save to history
+    history := models.History{
+      EDASRequests:  []models.EDASRequest{request},
+      EDASResponses: []models.EDASResponse{edasResponse},
+      Rankings:      rankedAlternatives,
+    }
+
+    err := SaveHistory(history)
+    if err != nil {
+      log.Println("Failed to save history:", err)
+    }
+
+    return edasResponse
+    ```
+- An EDASResponse is created, containing the ranked alternatives.
+- Optionally, the request, response, and rankings can be saved to a history.
+
 ## Features
 
 - **Multi-criteria Decision Analysis:** Evaluate alternatives based on multiple criteria.
@@ -132,6 +257,14 @@ The server will start on `http://localhost:8080`.
         ]
     }
     ```
+
+## Things to note
+- Every variable is Case-Sensitive, variables such as name, scores, weight, and type should be fully lowercased
+- Every variable but name and type should be float64 OR integer
+- Variable type is Case-Sensitive, and any values other than "benefit" will be treated as cost
+
+**VERY IMPORTANT**
+- The API will **NOT** run unless the .env file contains the correct MongoDB configuration, such as URI and database name.
 
 ## Example
 
