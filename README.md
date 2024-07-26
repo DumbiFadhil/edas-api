@@ -1,6 +1,8 @@
 # EDAS API
 
-![EDAS API](https://img.shields.io/badge/EDAS-API-blue.svg)
+[![EDAS API](https://img.shields.io/badge/EDAS-API-blue.svg)](https://github.com/DumbiFadhil/edas-api)
+[![Go Report Card](https://goreportcard.com/badge/github.com/DumbiFadhil/edas-api)](https://goreportcard.com/report/github.com/DumbiFadhil/edas-api) 
+[![GoDoc](https://godoc.org/github.com/DumbiFadhil/edas-api?status.svg)](https://godoc.org/github.com/DumbiFadhil/edas-api)
 
 ## Overview
 
@@ -28,7 +30,27 @@ This algorithm provides a structured way to evaluate and rank multiple alternati
 5. **Ranking:**
    - Sort alternatives based on their final scores, from highest to lowest.
 
+## Key Features
+
+- **Multi-Criteria Evaluation:**  Handles complex decisions with multiple factors.
+- **Weighted Criteria:**  Prioritize criteria based on their importance.
+- **Benefit/Cost Flexibility:**  Works with criteria where higher or lower scores are preferred.
+- **Accurate Ranking:**  Provides a clear, data-driven ranking of alternatives.
+- **API-Driven:** Easy to integrate into your applications.
+- **History Tracking (MongoDB):** (Optional) Logs evaluation requests and results.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [API Endpoints](#api-endpoints)
+- [Example Request/Response](#example-requestresponse) 
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Code Breakdown
+
 1. **Initialization:**
     ```Go
     criterionAverages := make(map[string]float64)  // Map to store average scores
@@ -152,6 +174,7 @@ rankedAlternatives will hold the final results (alternatives with their calculat
 
 - Go 1.16 or higher
 - Git
+- MongoDB (if using history tracking)
 
 ### Steps
 
