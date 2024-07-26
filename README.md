@@ -79,7 +79,7 @@ The server will start on `http://localhost:8080`.
 
 ### Calculate EDAS
 
-- **URL:** `/api/edas`
+- **URL:** `/api/v1/edas`
 - **Method:** `POST`
 - **Content-Type:** `application/json`
 - **Request Body:**
@@ -138,7 +138,7 @@ The server will start on `http://localhost:8080`.
 Here's a quick example of how to use the API with `curl`:
 
 ```sh
-curl -X POST http://localhost:8080/api/edas \
+curl -X POST http://localhost:8080/api/v1/edas \
     -H "Content-Type: application/json" \
     -d '{
         "alternatives": [

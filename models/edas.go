@@ -1,6 +1,8 @@
 package models
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type Alternative struct {
 	Name   string             `json:"name"`
@@ -33,4 +35,9 @@ type History struct {
 	EDASRequests  []EDASRequest       `json:"edas_requests"`
 	EDASResponses []EDASResponse      `json:"edas_responses"`
 	Rankings      []RankedAlternative `json:"rankings"`
+}
+
+type HistoryListItem struct {
+	UUID     uuid.UUID           `json:"uuid,omitempty"` // Optional UUID
+	Rankings []RankedAlternative `json:"rankings"`
 }
